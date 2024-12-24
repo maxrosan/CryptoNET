@@ -1,4 +1,6 @@
 #pragma once
+#include <vcclr.h>
+
 
 #include "Cipher.h"
 
@@ -50,6 +52,9 @@ namespace CryptoNET {
 	private: System::Windows::Forms::Button^ button3;
 	private: System::Windows::Forms::ComboBox^ comboBoxAlgo;
 	private: System::Windows::Forms::Label^ label2;
+	private: System::Windows::Forms::Button^ button4;
+	private: System::Windows::Forms::Button^ button5;
+
 
 	private: Cipher^ cipher;
 	public:
@@ -92,6 +97,8 @@ namespace CryptoNET {
 			this->button3 = (gcnew System::Windows::Forms::Button());
 			this->comboBoxAlgo = (gcnew System::Windows::Forms::ComboBox());
 			this->label2 = (gcnew System::Windows::Forms::Label());
+			this->button4 = (gcnew System::Windows::Forms::Button());
+			this->button5 = (gcnew System::Windows::Forms::Button());
 			this->statusStrip1->SuspendLayout();
 			this->SuspendLayout();
 			// 
@@ -105,11 +112,11 @@ namespace CryptoNET {
 			// 
 			// button1
 			// 
-			this->button1->Location = System::Drawing::Point(311, 28);
+			this->button1->Location = System::Drawing::Point(302, 26);
 			this->button1->Name = L"button1";
 			this->button1->Size = System::Drawing::Size(139, 27);
 			this->button1->TabIndex = 1;
-			this->button1->Text = L"Open uncrypted text";
+			this->button1->Text = L"Open decrypted text";
 			this->button1->UseVisualStyleBackColor = true;
 			this->button1->Click += gcnew System::EventHandler(this, &MainForm::button1_Click);
 			// 
@@ -127,7 +134,7 @@ namespace CryptoNET {
 			// 
 			this->statusStrip1->ImageScalingSize = System::Drawing::Size(20, 20);
 			this->statusStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->toolStripStatusLabel1 });
-			this->statusStrip1->Location = System::Drawing::Point(0, 372);
+			this->statusStrip1->Location = System::Drawing::Point(0, 456);
 			this->statusStrip1->Name = L"statusStrip1";
 			this->statusStrip1->Size = System::Drawing::Size(623, 26);
 			this->statusStrip1->TabIndex = 3;
@@ -143,19 +150,19 @@ namespace CryptoNET {
 			// 
 			// richTextBox1
 			// 
-			this->richTextBox1->Location = System::Drawing::Point(32, 138);
+			this->richTextBox1->Location = System::Drawing::Point(32, 179);
 			this->richTextBox1->Name = L"richTextBox1";
-			this->richTextBox1->Size = System::Drawing::Size(553, 221);
+			this->richTextBox1->Size = System::Drawing::Size(553, 274);
 			this->richTextBox1->TabIndex = 4;
 			this->richTextBox1->Text = L"";
 			// 
 			// button2
 			// 
-			this->button2->Location = System::Drawing::Point(311, 81);
+			this->button2->Location = System::Drawing::Point(302, 79);
 			this->button2->Name = L"button2";
-			this->button2->Size = System::Drawing::Size(148, 27);
+			this->button2->Size = System::Drawing::Size(189, 27);
 			this->button2->TabIndex = 5;
-			this->button2->Text = L"Encrypt and save file";
+			this->button2->Text = L"Encrypt text and save file";
 			this->button2->UseVisualStyleBackColor = true;
 			this->button2->Click += gcnew System::EventHandler(this, &MainForm::button2_Click);
 			// 
@@ -165,7 +172,7 @@ namespace CryptoNET {
 			// 
 			// button3
 			// 
-			this->button3->Location = System::Drawing::Point(456, 28);
+			this->button3->Location = System::Drawing::Point(443, 26);
 			this->button3->Name = L"button3";
 			this->button3->Size = System::Drawing::Size(142, 27);
 			this->button3->TabIndex = 6;
@@ -191,11 +198,33 @@ namespace CryptoNET {
 			this->label2->TabIndex = 8;
 			this->label2->Text = L"Algorithm";
 			// 
+			// button4
+			// 
+			this->button4->Location = System::Drawing::Point(32, 126);
+			this->button4->Name = L"button4";
+			this->button4->Size = System::Drawing::Size(221, 26);
+			this->button4->TabIndex = 9;
+			this->button4->Text = L"Open file and convert to B64";
+			this->button4->UseVisualStyleBackColor = true;
+			this->button4->Click += gcnew System::EventHandler(this, &MainForm::button4_Click);
+			// 
+			// button5
+			// 
+			this->button5->Location = System::Drawing::Point(259, 127);
+			this->button5->Name = L"button5";
+			this->button5->Size = System::Drawing::Size(232, 25);
+			this->button5->TabIndex = 10;
+			this->button5->Text = L"Save B64 encoded text into bin file";
+			this->button5->UseVisualStyleBackColor = true;
+			this->button5->Click += gcnew System::EventHandler(this, &MainForm::button5_Click);
+			// 
 			// MainForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(623, 398);
+			this->ClientSize = System::Drawing::Size(623, 482);
+			this->Controls->Add(this->button5);
+			this->Controls->Add(this->button4);
 			this->Controls->Add(this->label2);
 			this->Controls->Add(this->comboBoxAlgo);
 			this->Controls->Add(this->button3);
@@ -275,7 +304,7 @@ private: System::Void button2_Click(System::Object^ sender, System::EventArgs^ e
 	if (saveFileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
 		if (comboBoxAlgo->SelectedItem == "AES256") {
 			try {
-				this->cipher->encode(richTextBox1->Text->ToString(), textBoxPass->Text, textBoxPass->Text, saveFileDialog->FileName);
+				this->cipher->encode(richTextBox1->Text->ToString(), textBoxPass->Text, saveFileDialog->FileName);
 				MessageBox::Show("File encrypted saved!", "Alert", MessageBoxButtons::OK, MessageBoxIcon::Warning);
 			}
 			catch (Exception^ e) {
@@ -306,7 +335,7 @@ private: System::Void button3_Click(System::Object^ sender, System::EventArgs^ e
 		if (comboBoxAlgo->SelectedItem == "AES256" && openFileDialog->FileName->Length > 0) {
 
 			try {
-				richTextBox1->Text = cipher->decode(openFileDialog->FileName, textBoxPass->Text, textBoxPass->Text);
+				richTextBox1->Text = cipher->decode(openFileDialog->FileName, textBoxPass->Text);
 				MessageBox::Show("Decrypted", "Alert", MessageBoxButtons::OK, MessageBoxIcon::Warning);
 			}
 			catch (Exception^ e) {
@@ -318,5 +347,55 @@ private: System::Void button3_Click(System::Object^ sender, System::EventArgs^ e
 
 }
 
+private: System::Void button4_Click(System::Object^ sender, System::EventArgs^ e) {
+
+	System::Windows::Forms::OpenFileDialog^ fileDialog = (gcnew System::Windows::Forms::OpenFileDialog());
+	fileDialog->Filter = "All files (*.*)|*.*";
+	fileDialog->FilterIndex = 1;
+	fileDialog->RestoreDirectory = true;
+
+
+	if (fileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+		try {
+			FileStream^ fs = gcnew FileStream(fileDialog->FileName, FileMode::Open, FileAccess::Read);
+			long fileSize = fs->Length;
+			array<Byte>^ buffer = gcnew array<Byte>(fileSize);
+			fs->Read(buffer, 0, fileSize);
+			String^ base64String = System::Convert::ToBase64String(buffer);
+			richTextBox1->Text = base64String;
+			MessageBox::Show("File read!", "Alert", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		}
+		catch (Exception^ e) {
+			MessageBox::Show("Failed: " + e->Message);
+		}
+	}
+
+}
+private: System::Void button5_Click(System::Object^ sender, System::EventArgs^ e) {
+
+	System::Windows::Forms::SaveFileDialog^ fileDialog = (gcnew System::Windows::Forms::SaveFileDialog());
+	fileDialog->Filter = "All files (*.*)|*.*";
+	fileDialog->FilterIndex = 1;
+	fileDialog->RestoreDirectory = true;
+
+	if (fileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+		try {
+			// Converter Base64 para array de bytes
+			array<Byte>^ binaryData = System::Convert::FromBase64String(richTextBox1->Text);
+
+			// Caminho onde você quer salvar o arquivo binário
+			String^ outputFileName = fileDialog->FileName;
+
+			// Salvar os dados binários em um arquivo
+			FileStream^ fs = gcnew FileStream(outputFileName, FileMode::Create, FileAccess::Write);
+			fs->Write(binaryData, 0, binaryData->Length);
+			fs->Close(); // Fechar o FileStream
+		}
+		catch (Exception^ e) {
+			MessageBox::Show("Failed: " + e->Message);
+		}
+	}
+
+}
 };
 }
