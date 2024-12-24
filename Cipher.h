@@ -11,6 +11,8 @@
 #include <Windows.h>
 #include <msclr\marshal_cppstd.h>
 #include <msclr\auto_gcroot.h>
+#include <msclr\marshal_cppstd.h>
+using namespace msclr::interop;
 
 using namespace System::Runtime::InteropServices;
 using namespace System;
@@ -28,6 +30,7 @@ typedef int (*EVP_EncryptFinal_ex_t)(EVP_CIPHER_CTX*, unsigned char*, int*);
 typedef int (*EVP_DecryptInit_ex_t)(EVP_CIPHER_CTX*, const EVP_CIPHER*, ENGINE*, const unsigned char*, const unsigned char*);
 typedef int (*EVP_DecryptUpdate_t)(EVP_CIPHER_CTX*, unsigned char*, int*, const unsigned char*, int);
 typedef int (*EVP_DecryptFinal_ex_t)(EVP_CIPHER_CTX*, unsigned char*, int*);
+typedef int (*EVP_CIPHER_CTX_set_padding_t)(EVP_CIPHER_CTX* ctx, int pad);
 
 ref class Cipher
 {
@@ -42,8 +45,8 @@ private:
 public:
 	Cipher();
 	~Cipher();
-	bool encode(System::String^ pass, System::String^ fileToSave);
-	void decode(System::String^ pass);
+	void encode(System::String^ plaintext, System::String^ key, System::String^ iv, System::String^ fileToSave);
+	System::String^ decode(System::String^ fileToLoad, System::String^ key, System::String^ iv);
 	void loadLibraries();
 	bool areLibrariesLoaded();
 };
