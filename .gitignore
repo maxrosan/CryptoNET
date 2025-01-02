@@ -72,3 +72,4 @@ dlldata.c
 
 # Rider
 *.sln.iml
+test.db

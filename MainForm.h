@@ -4,6 +4,7 @@
 
 #include "VirtualDisk.h"
 #include "Cipher.h"
+#include "DatabaseHandler.h"
 
 namespace CryptoNET {
 
@@ -68,6 +69,12 @@ namespace CryptoNET {
 	private: System::Windows::Forms::Button^ button10;
 	private: System::Windows::Forms::Button^ button9;
 	private: System::Windows::Forms::Button^ button11;
+	private: System::Windows::Forms::TabPage^ tabPage3;
+	private: System::Windows::Forms::Button^ button13;
+	private: System::Windows::Forms::Button^ button12;
+	private: System::Windows::Forms::DataGridView^ dataGridView1;
+	private: System::Windows::Forms::Button^ button14;
+	private: System::Windows::Forms::Button^ button15;
 
 
 
@@ -127,12 +134,20 @@ namespace CryptoNET {
 			this->comboBoxLetter = (gcnew System::Windows::Forms::ComboBox());
 			this->label3 = (gcnew System::Windows::Forms::Label());
 			this->button6 = (gcnew System::Windows::Forms::Button());
+			this->tabPage3 = (gcnew System::Windows::Forms::TabPage());
+			this->button15 = (gcnew System::Windows::Forms::Button());
+			this->button14 = (gcnew System::Windows::Forms::Button());
+			this->dataGridView1 = (gcnew System::Windows::Forms::DataGridView());
+			this->button13 = (gcnew System::Windows::Forms::Button());
+			this->button12 = (gcnew System::Windows::Forms::Button());
 			this->button11 = (gcnew System::Windows::Forms::Button());
 			this->statusStrip1->SuspendLayout();
 			this->tabControl1->SuspendLayout();
 			this->tabPage1->SuspendLayout();
 			this->tabPage2->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numericUpDownSize))->BeginInit();
+			this->tabPage3->SuspendLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView1))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// textBoxPass
@@ -255,6 +270,7 @@ namespace CryptoNET {
 			// 
 			this->tabControl1->Controls->Add(this->tabPage1);
 			this->tabControl1->Controls->Add(this->tabPage2);
+			this->tabControl1->Controls->Add(this->tabPage3);
 			this->tabControl1->Location = System::Drawing::Point(32, 158);
 			this->tabControl1->Name = L"tabControl1";
 			this->tabControl1->SelectedIndex = 0;
@@ -381,9 +397,75 @@ namespace CryptoNET {
 			this->button6->UseVisualStyleBackColor = true;
 			this->button6->Click += gcnew System::EventHandler(this, &MainForm::button6_Click);
 			// 
+			// tabPage3
+			// 
+			this->tabPage3->Controls->Add(this->button15);
+			this->tabPage3->Controls->Add(this->button14);
+			this->tabPage3->Controls->Add(this->dataGridView1);
+			this->tabPage3->Controls->Add(this->button13);
+			this->tabPage3->Controls->Add(this->button12);
+			this->tabPage3->Location = System::Drawing::Point(4, 25);
+			this->tabPage3->Name = L"tabPage3";
+			this->tabPage3->Padding = System::Windows::Forms::Padding(3);
+			this->tabPage3->Size = System::Drawing::Size(545, 283);
+			this->tabPage3->TabIndex = 2;
+			this->tabPage3->Text = L"Database";
+			this->tabPage3->UseVisualStyleBackColor = true;
+			// 
+			// button15
+			// 
+			this->button15->Location = System::Drawing::Point(6, 18);
+			this->button15->Name = L"button15";
+			this->button15->Size = System::Drawing::Size(77, 24);
+			this->button15->TabIndex = 4;
+			this->button15->Text = L"Create";
+			this->button15->UseVisualStyleBackColor = true;
+			this->button15->Click += gcnew System::EventHandler(this, &MainForm::button15_Click);
+			// 
+			// button14
+			// 
+			this->button14->Location = System::Drawing::Point(176, 18);
+			this->button14->Name = L"button14";
+			this->button14->Size = System::Drawing::Size(84, 24);
+			this->button14->TabIndex = 3;
+			this->button14->Text = L"Save";
+			this->button14->UseVisualStyleBackColor = true;
+			this->button14->Click += gcnew System::EventHandler(this, &MainForm::button14_Click);
+			// 
+			// dataGridView1
+			// 
+			this->dataGridView1->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
+			this->dataGridView1->Location = System::Drawing::Point(3, 57);
+			this->dataGridView1->Name = L"dataGridView1";
+			this->dataGridView1->RowHeadersWidth = 51;
+			this->dataGridView1->RowTemplate->Height = 24;
+			this->dataGridView1->Size = System::Drawing::Size(534, 220);
+			this->dataGridView1->TabIndex = 2;
+			this->dataGridView1->RowsAdded += gcnew System::Windows::Forms::DataGridViewRowsAddedEventHandler(this, &MainForm::dataGridView1_RowsAdded);
+			// 
+			// button13
+			// 
+			this->button13->Location = System::Drawing::Point(266, 18);
+			this->button13->Name = L"button13";
+			this->button13->Size = System::Drawing::Size(84, 24);
+			this->button13->TabIndex = 1;
+			this->button13->Text = L"Close";
+			this->button13->UseVisualStyleBackColor = true;
+			this->button13->Click += gcnew System::EventHandler(this, &MainForm::button13_Click);
+			// 
+			// button12
+			// 
+			this->button12->Location = System::Drawing::Point(89, 18);
+			this->button12->Name = L"button12";
+			this->button12->Size = System::Drawing::Size(84, 24);
+			this->button12->TabIndex = 0;
+			this->button12->Text = L"Open";
+			this->button12->UseVisualStyleBackColor = true;
+			this->button12->Click += gcnew System::EventHandler(this, &MainForm::button12_Click);
+			// 
 			// button11
 			// 
-			this->button11->Location = System::Drawing::Point(498, 82);
+			this->button11->Location = System::Drawing::Point(498, 81);
 			this->button11->Name = L"button11";
 			this->button11->Size = System::Drawing::Size(75, 23);
 			this->button11->TabIndex = 12;
@@ -417,6 +499,8 @@ namespace CryptoNET {
 			this->tabPage2->ResumeLayout(false);
 			this->tabPage2->PerformLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numericUpDownSize))->EndInit();
+			this->tabPage3->ResumeLayout(false);
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView1))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -775,5 +859,234 @@ private: System::Void button11_Click(System::Object^ sender, System::EventArgs^ 
 
 }
 
+private:
+	DatabaseHandler ^databaseHandler = nullptr;
+
+#define CHECK_DATABASE_HANDLER() do { if (databaseHandler == nullptr) { \
+	MessageBox::Show("Open a database first!"); \
+	return; \
+	} } while (0)
+
+
+private: void DataGridView_RowsRemoved(Object^ sender, DataGridViewRowCancelEventArgs^ e) {
+
+	if (databaseHandler == nullptr) {
+		return;
+	}
+
+	DataGridViewRow^ row = e->Row;
+
+	if (row == nullptr) {
+		return;
+	}
+
+	if (row->Cells["ID"] == nullptr || row->Cells["ID"] == nullptr) {
+		MessageBox::Show("There is no ID!");
+		return;
+	}
+
+	int id = safe_cast<int>(row->Cells["ID"]->Value);
+
+	if (id > 0) {
+		try {
+			databaseHandler->removeItem(id);
+		}
+		catch (Exception^ ex) {
+			MessageBox::Show("Failed to remove item " + ex->Message);
+		}
+	}
+
+}
+
+private: void initializeDataGrid() {
+
+	dataGridView1->Columns->Clear();
+
+	// Column for ID
+	DataGridViewColumn^ idColumn = gcnew DataGridViewTextBoxColumn();
+	idColumn->Name = "ID";
+	idColumn->HeaderText = "ID";
+	idColumn->DataPropertyName = "ID";  // If binding to a data source
+	idColumn->Width = 50;
+	dataGridView1->Columns->Add(idColumn);
+
+	// Column for Name
+	DataGridViewColumn^ urlColumn = gcnew DataGridViewTextBoxColumn();
+	urlColumn->Name = "URL";
+	urlColumn->HeaderText = "URL";
+	urlColumn->DataPropertyName = "URL";  // If binding to a data source
+	urlColumn->Width = 150;
+	dataGridView1->Columns->Add(urlColumn);
+
+	// Column for Login
+	DataGridViewColumn^ loginColumn = gcnew DataGridViewTextBoxColumn();
+	loginColumn->Name = "Login";
+	loginColumn->HeaderText = "Login";
+	loginColumn->DataPropertyName = "Login";  // If binding to a data source
+	loginColumn->Width = 150;
+	dataGridView1->Columns->Add(loginColumn);
+
+	// Column for Name
+	DataGridViewColumn^ passColumn = gcnew DataGridViewTextBoxColumn();
+	passColumn->Name = "Password";
+	passColumn->HeaderText = "Password";
+	passColumn->DataPropertyName = "Password";  // If binding to a data source
+	passColumn->Width = 150;
+	dataGridView1->Columns->Add(passColumn);
+
+	dataGridView1->Columns["ID"]->ReadOnly = true;
+
+
+}
+
+private: void reloadDatabase() {
+
+	dataGridView1->UserDeletingRow -= gcnew DataGridViewRowCancelEventHandler(this, &MainForm::DataGridView_RowsRemoved);
+
+	//dataGridView1->Rows->Clear();
+	
+	System::Collections::Generic::List<Credential^>^ credentials = databaseHandler->getCredentials();
+
+	DataTable^ table = gcnew DataTable();
+
+	table->Columns->Add("ID", System::Type::GetType("System.Int32"));
+	table->Columns->Add("url", System::Type::GetType("System.String"));
+	table->Columns->Add("login", System::Type::GetType("System.String"));
+	table->Columns->Add("password", System::Type::GetType("System.String"));
+
+	for (int i = 0; i < credentials->Count; i++) {
+		DataRow^ row = table->NewRow();
+		row["ID"] = credentials[i]->Id;
+		row["url"] = credentials[i]->Url;
+		row["login"] = credentials[i]->Login;
+		row["password"] = credentials[i]->Password;
+
+		table->Rows->Add(row);
+	}
+
+	dataGridView1->DataSource = table;
+
+	dataGridView1->UserDeletingRow += gcnew DataGridViewRowCancelEventHandler(this, &MainForm::DataGridView_RowsRemoved);
+}
+
+// Open Databse
+private: System::Void button12_Click(System::Object^ sender, System::EventArgs^ e) {
+
+	if (textBoxPass->TextLength != 16) {
+		MessageBox::Show("Password must contain 16 characters");
+		return;
+	}
+
+	if (comboBoxAlgo->SelectedIndex == -1) {
+		MessageBox::Show("Choose an algorithm to encrypt the message!");
+		return;
+	}
+
+	if (databaseHandler != nullptr) {
+		MessageBox::Show("Close the current database before opening another one!");
+		return;
+	}
+
+	try {
+		System::Windows::Forms::OpenFileDialog^ fileDialog = (gcnew System::Windows::Forms::OpenFileDialog());
+		fileDialog->Filter = "Encrypted database files (*.enc)|*.enc";
+		fileDialog->FilterIndex = 1;
+		fileDialog->RestoreDirectory = true;
+		if (fileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+			System::String ^fileNameDb = removeExtension(fileDialog->FileName);
+			cipher->decodeLargeFiles(fileDialog->FileName, textBoxPass->Text, fileNameDb);
+			cipher->eraseFile(fileDialog->FileName);
+			databaseHandler = gcnew DatabaseHandler(fileNameDb);
+		}
+
+	}
+	catch (Exception^ e) {
+		MessageBox::Show("Failed: " + e->Message);
+		return;
+	}
+
+	initializeDataGrid();
+	reloadDatabase();
+
+	
+}
+// Close
+private: System::Void button13_Click(System::Object^ sender, System::EventArgs^ e) {
+
+	if (textBoxPass->TextLength != 16) {
+		MessageBox::Show("Password must contain 16 characters", "Alert", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		return;
+	}
+
+	if (comboBoxAlgo->SelectedIndex == -1) {
+		MessageBox::Show("Choose an algorithm to encrypt the message!", "Alert", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		return;
+	}
+
+	dataGridView1->UserDeletingRow -= gcnew DataGridViewRowCancelEventHandler(this, &MainForm::DataGridView_RowsRemoved);
+
+
+	System::String ^fileName = databaseHandler->getFileName();
+	delete databaseHandler;
+	databaseHandler = nullptr;
+
+	cipher->encodeLargeFiles(fileName, textBoxPass->Text, fileName + ".enc");
+	cipher->eraseFile(fileName);
+
+	dataGridView1->Columns->Clear();
+
+}
+private: System::Void dataGridView1_RowsAdded(System::Object^ sender, System::Windows::Forms::DataGridViewRowsAddedEventArgs^ e) {
+
+}
+
+// Save
+private: System::Void button14_Click(System::Object^ sender, System::EventArgs^ e) {
+
+	CHECK_DATABASE_HANDLER();
+
+	for (int i = 0; i < dataGridView1->Rows->Count; i++) {
+
+		if (dataGridView1->Rows[i]->Cells["ID"] != nullptr && 
+			(dataGridView1->Rows[i]->Cells["ID"]->Value != nullptr && dataGridView1->Rows[i]->Cells["ID"]->Value->ToString()->Length < 1 )) {
+			databaseHandler->addItem(
+				dataGridView1->Rows[i]->Cells["URL"]->Value->ToString(), 
+				dataGridView1->Rows[i]->Cells["Login"]->Value->ToString(),
+				dataGridView1->Rows[i]->Cells["Password"]->Value->ToString());
+		}
+	}
+
+	initializeDataGrid();
+	reloadDatabase();
+
+	databaseHandler->commit();
+}
+
+// Create
+private: System::Void button15_Click(System::Object^ sender, System::EventArgs^ e) {
+
+	if (databaseHandler != nullptr) {
+		MessageBox::Show("Close the current database before creating another one!");
+		return;
+	}
+
+	try {
+		System::Windows::Forms::SaveFileDialog^ fileDialog = (gcnew System::Windows::Forms::SaveFileDialog());
+		fileDialog->Filter = "Encrypted database files (*.edb)|*.edb";
+		fileDialog->FilterIndex = 1;
+		fileDialog->RestoreDirectory = true;
+		if (fileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+			databaseHandler = gcnew DatabaseHandler(fileDialog->FileName);
+		}
+	}
+	catch (Exception^ e) {
+		MessageBox::Show("Failed: " + e->Message);
+		return;
+	}
+
+	initializeDataGrid();
+	reloadDatabase();
+
+}
 };
 }
