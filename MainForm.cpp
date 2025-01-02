@@ -3,6 +3,8 @@
 using namespace System;
 using namespace System::Windows::Forms;
 
+using namespace CryptoNET;
+
 [STAThread]
 void main(array<String^>^ args) {
 

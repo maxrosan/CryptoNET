@@ -6,6 +6,7 @@
 #include <openssl/crypto.h>
 #include <openssl/ssl.h>
 #include <openssl/rand.h>
+#include <openssl/sha.h>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -25,7 +26,6 @@ typedef int (*PKCS5_PBKDF2_HMAC_ptr)(const char* pass, int passlen,
 	int keylen, unsigned char* out);
 
 typedef int (*RAND_bytes_ptr)(unsigned char* buf, int num);
-
 typedef int (*OPENSSL_init_crypto_t)(uint64_t opts, const OPENSSL_INIT_SETTINGS* settings);
 typedef const EVP_CIPHER* (*EVP_aes_128_cbc_t)();
 typedef const EVP_CIPHER* (*EVP_aes_256_cbc_t)();
@@ -41,6 +41,8 @@ typedef int (*EVP_DecryptFinal_ex_t)(EVP_CIPHER_CTX*, unsigned char*, int*);
 typedef int (*EVP_CIPHER_CTX_set_padding_t)(EVP_CIPHER_CTX* ctx, int pad);
 typedef const EVP_MD* (*EVP_sha256_ptr)(void);
 
+typedef unsigned char* (*SHA256_t) (const unsigned char* d, size_t n, unsigned char* md);
+
 ref class Cipher
 {
 private:
@@ -55,6 +57,10 @@ public:
 	Cipher();
 	~Cipher();
 	void encode(System::String^ plaintext, System::String^ key, System::String^ fileToSave);
+	void encodeLargeFiles(System::String^ fileToOpen, System::String^ key, System::String^ fileToSave);
+	void decodeLargeFiles(System::String^ fileToOpen, System::String^ key, System::String^ fileToSave);
+	void eraseFile(System::String^ fileToErase);
+	std::vector<unsigned char> sha256(System::String^ password);
 	System::String^ decode(System::String^ fileToLoad, System::String^ key);
 	void loadLibraries();
 	bool areLibrariesLoaded();

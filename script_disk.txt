@@ -1,0 +1,7 @@
+create vdisk file="D:\newimage2.vhd" maximum=1024 type=expandable
+select vdisk file="D:\newimage2.vhd"
+attach vdisk
+create partition primary
+format fs=ntfs label="VHD" quick compress override
+assign letter=V
+detach vdisk

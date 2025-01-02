@@ -78,10 +78,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Codigos\SSL\openssl-3.4.0\dist\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Codigos\SSL\openssl-3.4.0\dist\include;C:\Program Files\Dokan\Dokan Library-2.2.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies />
+      <AdditionalDependencies>C:\Program Files\Dokan\Dokan Library-2.2.0\lib\dokan2.lib;C:\Program Files\Dokan\Dokan Library-2.2.0\lib\dokanfuse2.lib;C:\Program Files\Dokan\Dokan Library-2.2.0\lib\dokannp2.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>main</EntryPointSymbol>
     </Link>
@@ -123,17 +123,22 @@
   <ItemGroup>
     <ClCompile Include="Cipher.cpp" />
     <ClCompile Include="MainForm.cpp" />
+    <ClCompile Include="VirtualDisk.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cipher.h" />
     <ClInclude Include="MainForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="VirtualDisk.h" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.h</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="script_disk.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
