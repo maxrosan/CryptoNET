@@ -197,6 +197,8 @@ std::vector<unsigned char> Cipher::sha256(System::String^ password) {
     return result;
 }
 
+
+
 void Cipher::encodeLargeFiles(System::String^ fileToOpen, System::String^ key, System::String^ fileToSave) {
 
     unsigned char* key_arr = static_cast<unsigned char*>(Marshal::StringToHGlobalAnsi(key).ToPointer());
@@ -293,6 +295,124 @@ void Cipher::encodeLargeFiles(System::String^ fileToOpen, System::String^ key, S
     FREE(inbuffer);
     FREE(outbuffer);
 
+}
+
+array<Byte>^ Cipher::encodeText(System::String^ plaintext, System::String^ key, int maxLength) {
+
+    unsigned char* key_arr = static_cast<unsigned char*>(Marshal::StringToHGlobalAnsi(key).ToPointer());
+
+    NEW(unsigned char, iv_array, EVP_MAX_IV_LENGTH);
+    NEW(unsigned char, salt_array, SALT_LENGTH);
+    NEW(unsigned char, final_key, EVP_MAX_KEY_LENGTH);
+    NEW(unsigned char, outbuffer, maxLength * 2);
+    int out_len;
+
+    if (!areLibrariesLoaded()) {
+        throw gcnew Exception("Libraries aren't loaded!");
+    }
+
+
+    if ((plaintext->Length + 4) > maxLength) {
+        throw gcnew Exception("String larger than maximum length allowed");
+    }
+
+    std::vector<unsigned char> plaintext_vec(maxLength);
+    std::vector<unsigned char> output;
+
+    for (int i = 0; i < 4; i++) {
+        plaintext_vec[i] = (plaintext->Length >> i) & 0xFF;
+    }
+
+    for (int i = 0; i < plaintext->Length; i++) {
+        plaintext_vec[(i + 4)] = static_cast<unsigned char>(plaintext[i]);
+    }
+
+    LOAD_FUNC(RAND_bytes_ptr, RAND_bytes);
+    if (!RAND_bytes(salt_array, sizeof(salt_array))) {
+        FreeLibrary(hLibCrypto);
+        throw gcnew Exception("Falha ao gerar salt aleatório\n");
+    }
+
+    for (int i = (4 + plaintext->Length); i < maxLength; i++) {
+        plaintext_vec[i] = salt_array[i % SALT_LENGTH];
+    }
+
+    LOAD_FUNC(OPENSSL_init_crypto_t, OPENSSL_init_crypto);
+    LOAD_FUNC(EVP_CIPHER_CTX_new_t, EVP_CIPHER_CTX_new);
+    LOAD_FUNC(EVP_CIPHER_CTX_free_t, EVP_CIPHER_CTX_free);
+    LOAD_FUNC(EVP_aes_256_cbc_t, EVP_aes_256_cbc);
+    LOAD_FUNC(EVP_EncryptInit_ex_t, EVP_EncryptInit_ex);
+    LOAD_FUNC(EVP_EncryptUpdate_t, EVP_EncryptUpdate);
+    LOAD_FUNC(EVP_EncryptFinal_ex_t, EVP_EncryptFinal_ex);
+    LOAD_FUNC(PKCS5_PBKDF2_HMAC_ptr, PKCS5_PBKDF2_HMAC);
+    LOAD_FUNC(EVP_sha256_ptr, EVP_sha256);
+
+    if (!RAND_bytes(salt_array, sizeof(salt_array))) {
+        FreeLibrary(hLibCrypto);
+        throw gcnew Exception("Falha ao gerar salt aleatório\n");
+    }
+
+    if (!RAND_bytes(iv_array, sizeof(iv_array))) {
+        FreeLibrary(hLibCrypto);
+        throw gcnew Exception("Falha ao gerar IV aleatório\n");
+    }
+
+    if (!PKCS5_PBKDF2_HMAC(reinterpret_cast<const char*>(key_arr), -1, salt_array, sizeof(salt_array), 10000, EVP_sha256(), sizeof(final_key), final_key)) {
+        FreeLibrary(hLibCrypto);
+        throw gcnew Exception("Falha ao derivar a chave\n");
+    }
+
+    EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
+
+    if (!ctx) {
+        throw gcnew Exception("Falha em criar contexto de cifra.");
+    }
+
+    if (1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, (const unsigned char*)final_key, (const unsigned char*)iv_array)) {
+        EVP_CIPHER_CTX_free(ctx);
+        throw gcnew Exception("Falha ao inicializar a cifra.");
+    }
+
+    for (int i = 0; i < EVP_MAX_IV_LENGTH; i++) {
+        output.push_back(iv_array[i]);
+    }
+
+    for (int i = 0; i < SALT_LENGTH; i++) {
+        output.push_back(salt_array[i]);
+    }
+
+    if (1 != EVP_EncryptUpdate(ctx, outbuffer, &out_len, plaintext_vec.data(), plaintext_vec.size())) {
+        EVP_CIPHER_CTX_free(ctx);
+        throw gcnew Exception("Falha ao atualizar a cifra.");
+    }
+
+    for (int i = 0; i < out_len; i++) {
+        output.push_back(outbuffer[i]);
+    }
+
+    if (1 != EVP_EncryptFinal_ex(ctx, outbuffer, &out_len)) {
+        throw gcnew System::Exception("Failed to finish the process");
+    }
+
+    for (int i = 0; i < out_len; i++) {
+        output.push_back(outbuffer[i]);
+    }
+
+
+    EVP_CIPHER_CTX_free(ctx);
+
+    FREE(iv_array);
+    FREE(salt_array);
+    FREE(final_key);
+    FREE(outbuffer);
+
+    array<Byte>^ managedArray = gcnew array<Byte>(output.size());
+    for (size_t i = 0; i < output.size(); ++i)
+    {
+        managedArray[i] = output[i];
+    }
+    
+    return managedArray;
 }
 
 void Cipher::encode(System::String^ plaintext, System::String^ key, System::String^ fileToSave) {
