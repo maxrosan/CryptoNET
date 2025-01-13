@@ -58,6 +58,7 @@ public:
 	~Cipher();
 	void encode(System::String^ plaintext, System::String^ key, System::String^ fileToSave);
 	void encodeLargeFiles(System::String^ fileToOpen, System::String^ key, System::String^ fileToSave);
+	System::String^ decodeText(array<Byte>^ input, System::String^ key);
 	array<Byte>^ encodeText(System::String^ plaintext, System::String^ key, int paddingMaxLength);
 	void decodeLargeFiles(System::String^ fileToOpen, System::String^ key, System::String^ fileToSave);
 	void eraseFile(System::String^ fileToErase);

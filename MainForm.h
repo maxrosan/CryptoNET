@@ -85,6 +85,8 @@ namespace CryptoNET {
 
 	private: System::Windows::Forms::Button^ button18;
 	private: System::Windows::Forms::Button^ button19;
+	private: System::Windows::Forms::Button^ button20;
+	private: System::Windows::Forms::Button^ button21;
 
 
 
@@ -152,6 +154,7 @@ namespace CryptoNET {
 			this->button13 = (gcnew System::Windows::Forms::Button());
 			this->button12 = (gcnew System::Windows::Forms::Button());
 			this->tabPage4 = (gcnew System::Windows::Forms::TabPage());
+			this->button20 = (gcnew System::Windows::Forms::Button());
 			this->button19 = (gcnew System::Windows::Forms::Button());
 			this->button18 = (gcnew System::Windows::Forms::Button());
 			this->label5 = (gcnew System::Windows::Forms::Label());
@@ -159,6 +162,7 @@ namespace CryptoNET {
 			this->button17 = (gcnew System::Windows::Forms::Button());
 			this->dataGridView2 = (gcnew System::Windows::Forms::DataGridView());
 			this->button11 = (gcnew System::Windows::Forms::Button());
+			this->button21 = (gcnew System::Windows::Forms::Button());
 			this->statusStrip1->SuspendLayout();
 			this->tabControl1->SuspendLayout();
 			this->tabPage1->SuspendLayout();
@@ -497,6 +501,8 @@ namespace CryptoNET {
 			// 
 			// tabPage4
 			// 
+			this->tabPage4->Controls->Add(this->button21);
+			this->tabPage4->Controls->Add(this->button20);
 			this->tabPage4->Controls->Add(this->button19);
 			this->tabPage4->Controls->Add(this->button18);
 			this->tabPage4->Controls->Add(this->label5);
@@ -511,11 +517,21 @@ namespace CryptoNET {
 			this->tabPage4->Text = L"Database Memory";
 			this->tabPage4->UseVisualStyleBackColor = true;
 			// 
+			// button20
+			// 
+			this->button20->Location = System::Drawing::Point(349, 11);
+			this->button20->Name = L"button20";
+			this->button20->Size = System::Drawing::Size(94, 23);
+			this->button20->TabIndex = 6;
+			this->button20->Text = L"Save DB file";
+			this->button20->UseVisualStyleBackColor = true;
+			this->button20->Click += gcnew System::EventHandler(this, &MainForm::button20_Click);
+			// 
 			// button19
 			// 
-			this->button19->Location = System::Drawing::Point(146, 11);
+			this->button19->Location = System::Drawing::Point(234, 11);
 			this->button19->Name = L"button19";
-			this->button19->Size = System::Drawing::Size(75, 23);
+			this->button19->Size = System::Drawing::Size(109, 23);
 			this->button19->TabIndex = 5;
 			this->button19->Text = L"Decrypt pass";
 			this->button19->UseVisualStyleBackColor = true;
@@ -525,9 +541,9 @@ namespace CryptoNET {
 			// 
 			this->button18->Location = System::Drawing::Point(87, 11);
 			this->button18->Name = L"button18";
-			this->button18->Size = System::Drawing::Size(53, 23);
+			this->button18->Size = System::Drawing::Size(141, 23);
 			this->button18->TabIndex = 4;
-			this->button18->Text = L"Save";
+			this->button18->Text = L"Save new records";
 			this->button18->UseVisualStyleBackColor = true;
 			this->button18->Click += gcnew System::EventHandler(this, &MainForm::button18_Click);
 			// 
@@ -576,6 +592,16 @@ namespace CryptoNET {
 			this->button11->Text = L"SHA256";
 			this->button11->UseVisualStyleBackColor = true;
 			this->button11->Click += gcnew System::EventHandler(this, &MainForm::button11_Click);
+			// 
+			// button21
+			// 
+			this->button21->Location = System::Drawing::Point(449, 11);
+			this->button21->Name = L"button21";
+			this->button21->Size = System::Drawing::Size(73, 23);
+			this->button21->TabIndex = 7;
+			this->button21->Text = L"Load File";
+			this->button21->UseVisualStyleBackColor = true;
+			this->button21->Click += gcnew System::EventHandler(this, &MainForm::button21_Click);
 			// 
 			// MainForm
 			// 
@@ -1344,14 +1370,111 @@ private: System::Void button18_Click(System::Object^ sender, System::EventArgs^ 
 }
 	   // decrypt RAM
 private: System::Void button19_Click(System::Object^ sender, System::EventArgs^ e) {
+
+	CHECK_DATABASE_RAM_HANDLER();
+
+	if (textBoxPass->TextLength != 16) {
+		MessageBox::Show("Password must contain 16 characters");
+		return;
+	}
+
+	if (comboBoxAlgo->SelectedIndex == -1) {
+		MessageBox::Show("Choose an algorithm to encrypt the message!");
+		return;
+	}
+
 	if (dataGridView2->SelectedRows->Count != 1) {
 		MessageBox::Show("Select only one row!");
 	}
 	else {
-		// Pega a primeira linha selecionada
-		DataGridViewRow^ selectedRow = dataGridView2->SelectedRows[0];
-		// TODO
+		try {
+			// Pega a primeira linha selecionada
+			DataGridViewRow^ selectedRow = dataGridView2->SelectedRows[0];
+			if (selectedRow->Cells["ID"]->Value != nullptr && selectedRow->Cells["ID"]->Value->ToString()->Length > 0) {
+				MessageBox::Show("ID " + selectedRow->Cells["ID"]->Value->ToString());
+				Credential^ credential = databaseRAMHandler->getCredential(selectedRow->Cells["ID"]->Value->ToString());
+				if (credential != nullptr) {
+					array<Byte>^ byteArray = Convert::FromBase64String(credential->Password);
+					textBoxPassDec->Text = cipher->decodeText(byteArray, textBoxPass->Text);
+				}
+				else {
+					MessageBox::Show("Failed to fetch login info");
+				}
+			}
+		}
+		catch (Exception^ e) {
+			MessageBox::Show("Failed to fetch the data: " + e->Message);
+		}
 	}
+}
+	   // Save DB RAM
+private: System::Void button20_Click(System::Object^ sender, System::EventArgs^ e) {
+
+	CHECK_DATABASE_RAM_HANDLER();
+
+	if (textBoxPass->TextLength != 16) {
+		MessageBox::Show("Password must contain 16 characters");
+		return;
+	}
+
+	if (comboBoxAlgo->SelectedIndex == -1) {
+		MessageBox::Show("Choose an algorithm to encrypt the message!");
+		return;
+	}
+
+	try {
+		
+		System::Windows::Forms::SaveFileDialog^ fileDialog = (gcnew System::Windows::Forms::SaveFileDialog());
+		fileDialog->Filter = "Encrypted Database files (*.edb)|*.edb";
+		fileDialog->FilterIndex = 1;
+		fileDialog->RestoreDirectory = true;
+		if (fileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+			databaseRAMHandler->saveFile(fileDialog->FileName, textBoxPass->Text);
+			MessageBox::Show("DB file saved!");
+		}
+
+	}
+	catch (Exception^ e) {
+		MessageBox::Show("Failed to save DB file: " + e->Message);
+	}
+
+}
+//Load DB RAM file
+private: System::Void button21_Click(System::Object^ sender, System::EventArgs^ e) {
+
+	if (databaseRAMHandler != nullptr) {
+		delete databaseRAMHandler;
+	}
+	databaseRAMHandler = gcnew DatabaseRAMHandler(DB_RAM, cipher);
+
+	if (textBoxPass->TextLength != 16) {
+		MessageBox::Show("Password must contain 16 characters");
+		return;
+	}
+
+	if (comboBoxAlgo->SelectedIndex == -1) {
+		MessageBox::Show("Choose an algorithm to encrypt the message!");
+		return;
+	}
+
+	try {
+
+		System::Windows::Forms::OpenFileDialog^ fileDialog = (gcnew System::Windows::Forms::OpenFileDialog());
+		fileDialog->Filter = "Encrypted Database files (*.edb)|*.edb";
+		fileDialog->FilterIndex = 1;
+		fileDialog->RestoreDirectory = true;
+		if (fileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+			databaseRAMHandler->loadFile(fileDialog->FileName, textBoxPass->Text);
+			MessageBox::Show("DB file load!");
+			initializeDBRAM();
+			reloadDatabaseRAM();
+		}
+
+	}
+	catch (Exception^ e) {
+		MessageBox::Show("Failed to save DB file: " + e->Message);
+	}
+
 }
 };
 }

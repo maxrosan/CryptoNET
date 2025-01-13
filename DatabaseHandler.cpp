@@ -16,6 +16,9 @@ void DatabaseHandler::loadSQLite() {
     sqlite3_free = (sqlite3_free_ptr)GetProcAddress(hSQLiteDll, "sqlite3_free");
     sqlite3_column_text = (sqlite3_column_text_ptr)GetProcAddress(hSQLiteDll, "sqlite3_column_text");
     sqlite3_column_int = (sqlite3_column_int_ptr) GetProcAddress(hSQLiteDll, "sqlite3_column_int");
+    sqlite3_backup_init = (sqlite3_backup_init_ptr)GetProcAddress(hSQLiteDll, "sqlite3_backup_init");
+    sqlite3_backup_step = (sqlite3_backup_step_ptr)GetProcAddress(hSQLiteDll, "sqlite3_backup_step");
+    sqlite3_backup_finish = (sqlite3_backup_finish_ptr)GetProcAddress(hSQLiteDll, "sqlite3_backup_finish");
 
 
     if (!sqlite3_open || !sqlite3_exec || !sqlite3_prepare_v2 || !sqlite3_step || !sqlite3_finalize || !sqlite3_close 

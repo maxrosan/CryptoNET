@@ -297,6 +297,112 @@ void Cipher::encodeLargeFiles(System::String^ fileToOpen, System::String^ key, S
 
 }
 
+System::String^ Cipher::decodeText(array<Byte>^ input, System::String^ key) {
+
+    EVP_CIPHER_CTX* ctx;
+    unsigned char* key_arr = static_cast<unsigned char*>(Marshal::StringToHGlobalAnsi(key).ToPointer());
+
+    NEW(unsigned char, iv_array, EVP_MAX_IV_LENGTH);
+    NEW(unsigned char, salt_array, SALT_LENGTH);
+    NEW(unsigned char, final_key, EVP_MAX_KEY_LENGTH);
+    NEW(unsigned char, outbuffer, BUFFER_LARGE_FILE);
+    int out_len;
+
+    LOAD_FUNC(OPENSSL_init_crypto_t, OPENSSL_init_crypto);
+    LOAD_FUNC(EVP_CIPHER_CTX_new_t, EVP_CIPHER_CTX_new);
+    LOAD_FUNC(EVP_CIPHER_CTX_free_t, EVP_CIPHER_CTX_free);
+    LOAD_FUNC(EVP_aes_256_cbc_t, EVP_aes_256_cbc);
+    LOAD_FUNC(EVP_DecryptInit_ex_t, EVP_DecryptInit_ex);
+    LOAD_FUNC(EVP_DecryptUpdate_t, EVP_DecryptUpdate);
+    LOAD_FUNC(EVP_DecryptFinal_ex_t, EVP_DecryptFinal_ex);
+    LOAD_FUNC(PKCS5_PBKDF2_HMAC_ptr, PKCS5_PBKDF2_HMAC);
+    LOAD_FUNC(RAND_bytes_ptr, RAND_bytes);
+    LOAD_FUNC(EVP_sha256_ptr, EVP_sha256);
+
+    if (!areLibrariesLoaded()) {
+        throw gcnew Exception("Libraries aren't loaded!");
+    }
+
+    std::vector<unsigned char> input_vec;
+    int text_length = 0;
+
+    for (int i = 0; i < input->Length; i++) {
+        unsigned char uc = static_cast<unsigned char>(input[i]);
+        input_vec.push_back(uc);
+    }
+
+    for (int i = 0; i < EVP_MAX_IV_LENGTH; i++) {
+        iv_array[i] = input_vec[i];
+    }
+
+    for (int i = 0; i < SALT_LENGTH; i++) {
+        salt_array[i] = input_vec[i + EVP_MAX_IV_LENGTH];
+    }
+
+    if (!PKCS5_PBKDF2_HMAC(reinterpret_cast<const char*>(key_arr), -1, salt_array, sizeof(salt_array), 10000, EVP_sha256(), sizeof(final_key), final_key)) {
+        throw gcnew Exception("Falha ao derivar a chave\n");
+        FreeLibrary(hLibCrypto);
+    }
+
+    ctx = EVP_CIPHER_CTX_new();
+
+    if (!ctx) {
+        throw gcnew Exception("Falha em criar contexto de cifra.");
+    }
+
+    if (1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, (const unsigned char*)final_key, (const unsigned char*)iv_array)) {
+        EVP_CIPHER_CTX_free(ctx);
+        throw gcnew Exception("Falha ao inicializar a descriptografia.");
+    }
+
+    std::vector<unsigned char> decryptedtext;
+
+    if (1 != EVP_DecryptUpdate(ctx, outbuffer, &out_len, input_vec.data() + EVP_MAX_IV_LENGTH + SALT_LENGTH, input_vec.size() - EVP_MAX_IV_LENGTH - SALT_LENGTH)) {
+        EVP_CIPHER_CTX_free(ctx);
+        throw gcnew Exception("Falha ao atualizar a cifra.");
+    }
+    
+    for (int i = 0; i < out_len; i++) {
+        decryptedtext.push_back(outbuffer[i]);
+    }
+    
+
+    if (1 != EVP_DecryptFinal_ex(ctx, outbuffer, &out_len)) {
+        throw gcnew System::Exception("Failed to finish the process");
+    }
+
+    for (int i = 0; i < out_len; i++) {
+        decryptedtext.push_back(outbuffer[i]);
+    }
+
+    EVP_CIPHER_CTX_free(ctx);
+
+    int text_len = 0;
+
+    for (int i = 0; i < 4; i++) {
+        text_len += (decryptedtext[i] << (i*8));
+    }
+
+    System::String^ outputString;
+    array<Byte>^ managedArray = gcnew array<Byte>(text_len);
+
+    for (int i = 0; i < text_len; i++) {
+        managedArray[i] = decryptedtext[i + 4];
+    }
+
+    outputString = Encoding::ASCII->GetString(managedArray);
+
+    //
+
+    FREE(iv_array);
+    FREE(salt_array);
+    FREE(final_key);
+    FREE(outbuffer);
+
+    return outputString;
+
+}
+
 array<Byte>^ Cipher::encodeText(System::String^ plaintext, System::String^ key, int maxLength) {
 
     unsigned char* key_arr = static_cast<unsigned char*>(Marshal::StringToHGlobalAnsi(key).ToPointer());
@@ -320,7 +426,7 @@ array<Byte>^ Cipher::encodeText(System::String^ plaintext, System::String^ key, 
     std::vector<unsigned char> output;
 
     for (int i = 0; i < 4; i++) {
-        plaintext_vec[i] = (plaintext->Length >> i) & 0xFF;
+        plaintext_vec[i] = (plaintext->Length >> (i * 8)) & 0xFF;
     }
 
     for (int i = 0; i < plaintext->Length; i++) {

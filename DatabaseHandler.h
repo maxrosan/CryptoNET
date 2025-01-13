@@ -22,6 +22,9 @@ typedef const void* (*sqlite3_errmsg_ptr) (sqlite3*);
 typedef void (*sqlite3_free_ptr)(void*);
 typedef unsigned char const* (*sqlite3_column_text_ptr) (struct sqlite3_stmt*, int);
 typedef int (*sqlite3_column_int_ptr)(struct sqlite3_stmt*, int);
+typedef void* (*sqlite3_backup_init_ptr) (void*, const char*, void*, const char*);
+typedef int (*sqlite3_backup_step_ptr)(void*, int);
+typedef int (*sqlite3_backup_finish_ptr)(void*);
 
 public ref class Credential
 {
@@ -79,6 +82,9 @@ private:
     sqlite3_free_ptr sqlite3_free;
     sqlite3_column_text_ptr sqlite3_column_text;
     sqlite3_column_int_ptr sqlite3_column_int;
+    sqlite3_backup_init_ptr sqlite3_backup_init;
+    sqlite3_backup_step_ptr sqlite3_backup_step;
+    sqlite3_backup_finish_ptr sqlite3_backup_finish;
     System::String^ fileName;
 
 public:
